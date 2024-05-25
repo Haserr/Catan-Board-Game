@@ -1,4 +1,5 @@
 import math
+from re import X
 import pygame
 import random
 import sys
@@ -10,7 +11,8 @@ from pygame.locals import *
 pygame.init()
 
 # Initialized some game colors
-backGround = (0,171,255)
+backGround = (0,171,255)  #blue
+WHITE = (255,255,255) #white
 
 # Tile Colors
 brickColor = (150,75,0)
@@ -133,13 +135,61 @@ def boardSetup(center, size):
         #self.rect = self.
         
 #class Road():
-#class House():
+class House():
+    def __init__(self,x,y,w,h,id):
+        self.x1 = x
+        self.y1 = y
+        self.x2 = x + w
+        self.y2 = y + h
+        
+        self.w = w
+        self.h = h
+        
+        self.fillColor = WHITE
+        self.stained = False
+        self.id = id
+        
+    # Setting the new position of a rectangle to mouse position
+    def setXY(self,xy):
+        self.x1,self.y1 = xy
+        self.x2 = xy[0] + self.w
+        self.y2 = xy[1] + self.h
+        
+    # Returns a coordinate
+    def getXY(self):
+        return(self.x1,self.y1)
+    
+    # Returns values needed to build a rectangle in the form of a tuple
+    def rect(self):
+        # The following 3 lines update the rectangle coords 
+        # Now it will be placed 0.5 * width and 0.5 * height 
+        # This centers the house on the mouse, so where ever you click is more accurate
+        coords = self.getXY()
+        x1 = coords[0] - (0.5*self.w)
+        y1 = coords[1] - (0.5*self.h)
+        
+        return (x1,y1,self.w, self.h)
+    
+    # Returns values needed to test for colision (x1,y1,x2,y2) in the form of a tuple
+    def coords(self):
+        return self.getXY() + (self.x2, self.y2)
+    
+    def draw(self, surface = None):
+        if not surface:
+            surface = pygame.display.get_surface()
+        pygame.draw.rect(surface,self.fillColor,self.rect(),0)
+        
+
 #class City():
 #class TileValue?():        
        
 
-# Attemp to setup entire board
+# Attempt to setup entire board
 boardSetup(center, size)
+
+# Attempt to setup a single house and test for colision
+house = House(100,100,25,25,0)
+house.draw(window)
 
 
 # ------------------------------ Game loop begins ------------------------------------
@@ -154,7 +204,13 @@ while running:
             if event.key == pygame.K_ESCAPE:
                 running = False
                 
-
+    # Placeing a house by getting mouse position and leftclicking
+    mb = pygame.mouse.get_pressed()
+    
+    house.setXY(pygame.mouse.get_pos())
+    if mb[0]:
+        house.draw(window)
+    
     # Update the display
     pygame.display.flip()
     
