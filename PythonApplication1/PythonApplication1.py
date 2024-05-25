@@ -5,6 +5,7 @@ import sys
 from pygame.draw import polygon
 from pygame.locals import *
 
+
 # Initialized the game engine
 pygame.init()
 
