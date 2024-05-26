@@ -39,100 +39,165 @@ FPS.tick(60)
 center = (200,100)
 size = 75
 
-# Function to calculate hexagon points
-def hexagon_points(center, size):
-    points = []
-    for i in range(6):
-        angle_deg = 60 * i - 30
-        angle_rad = math.radians(angle_deg)
-        x = center[0] + size * math.cos(angle_rad)
-        y = center[1] + size * math.sin(angle_rad)
-        points.append((x, y))
-    return points
+houseStartCoord = (100,100)
+houseSize = (25,25)
 
-# Function to draw a hexagon
-def draw_hexagon(center, size):
-    points = hexagon_points(center, size)
-    pygame.draw.polygon(window, blackColor, points,3)
-    pygame.draw.polygon(window, random.choice(tileColorList), points)
+EPSILON = 1e-9
+
+class Board():
+    def __init__(self, center, size):
+        self.center = center
+        self.size = size
+        self.points = []
+        
+
+    # Function to calculate hexagon points
+    def hexagon_points(self,center, size):
+        points = []
+        for i in range(6):
+            angle_deg = 60 * i - 30
+            angle_rad = math.radians(angle_deg)
+            x = center[0] + size * math.cos(angle_rad)
+            y = center[1] + size * math.sin(angle_rad)
+            points.append((x, y))
+            
+        # Set here for collision
+        self.points = points
+        return points
+
+    # Function to draw a hexagon
+    def draw_hexagon(self,center, size):
+        points = self.hexagon_points(center, size)
+        pygame.draw.polygon(window, blackColor, points,3)
+        pygame.draw.polygon(window, random.choice(tileColorList), points)
    
 
 
-# ------------------- Draws a hexagon in ceratain directions -----------------------
-# Direction is based off of the center, which are passed in as coords (tuple) of another hexagon 
-def hexUpLeft(center,size):
-    newCenter = (center[0] - .86 * size, center[1] - 1.5 * size)
-    return newCenter
+    # ------------------- Draws a hexagon in ceratain directions -----------------------
+    # Direction is based off of the center, which are passed in as coords (tuple) of another hexagon 
+    def hexUpLeft(self,center,size):
+        newCenter = (center[0] - .86 * size, center[1] - 1.5 * size)
+        return newCenter
 
-def hexUpRight(center,size):
-    newCenter = (center[0] + .86 * size, center[1] - 1.5 * size)
-    return newCenter
+    def hexUpRight(self,center,size):
+        newCenter = (center[0] + .86 * size, center[1] - 1.5 * size)
+        return newCenter
 
-def hexDownLeft(center,size):
-    newCenter = (center[0] - .86 * size, center[1] + 1.5 * size)
-    return newCenter
+    def hexDownLeft(self,center,size):
+        newCenter = (center[0] - .86 * size, center[1] + 1.5 * size)
+        return newCenter
 
-def hexDownRight(center,size):
-    newCenter = (center[0] + .86 * size, center[1] + 1.5 * size)
-    return newCenter
+    def hexDownRight(self,center,size):
+        newCenter = (center[0] + .86 * size, center[1] + 1.5 * size)
+        return newCenter
 
-def hexRight(center,size):
-    newCenter = (center[0] + 1.73 * size, center[1])
-    return newCenter
+    def hexRight(self,center,size):
+        newCenter = (center[0] + 1.73 * size, center[1])
+        return newCenter
 
-def hexLeft(center,size):
-    newCenter = (center[0] - 1.73 * size, center[1])
-    return newCenter  
+    def hexLeft(self,center,size):
+        newCenter = (center[0] - 1.73 * size, center[1])
+        return newCenter  
 
-def boardSetup(center, size):
+    def boardSetup(self,center, size):
     
-    # ---- Start of Draing ----
-    draw_hexagon(center,size)
-    temp = center
+        # ---- Start of Draing ----
+        self.draw_hexagon(center,size)
+        temp = center
     
-    for i in range(0,2):
-        temp = hexRight(temp,size)
-        draw_hexagon(temp,size)
+        for i in range(0,2):
+            temp = self.hexRight(temp,size)
+            self.draw_hexagon(temp,size)
     
-    # ------------ Top 3 Hexagons ---------------------
-    temp = hexDownRight(temp, size)
-    draw_hexagon(temp,size)
+        # ------------ Top 3 Hexagons 
+        temp = self.hexDownRight(temp, size)
+        self.draw_hexagon(temp,size)
     
-    for i in range(0,3):
-        temp = hexLeft(temp,size)
-        draw_hexagon(temp,size)
+        for i in range(0,3):
+            temp = self.hexLeft(temp,size)
+            self.draw_hexagon(temp,size)
     
-    # ------------- 2nd Row of Hexagons --------------------
-    temp = hexDownLeft(temp,size)
-    draw_hexagon(temp,size)
+        # ------------- 2nd Row of Hexagons 
+        temp = self.hexDownLeft(temp,size)
+        self.draw_hexagon(temp,size)
     
-    for i in range(0,4):
-        temp = hexRight(temp,size)
-        draw_hexagon(temp,size)
+        for i in range(0,4):
+            temp = self.hexRight(temp,size)
+            self.draw_hexagon(temp,size)
         
-    # -------------- 3rd Row of Hexagons -------------------
-    temp = hexDownLeft(temp, size)
-    draw_hexagon(temp,size)
+        # -------------- 3rd Row of Hexagons
+        temp = self.hexDownLeft(temp, size)
+        self.draw_hexagon(temp,size)
     
-    for i in range(0,3):
-        temp = hexLeft(temp,size)
-        draw_hexagon(temp,size)
+        for i in range(0,3):
+            temp = self.hexLeft(temp,size)
+            self.draw_hexagon(temp,size)
      
-    # -------------- Last Row of Hexagons -------------------
-    temp = hexDownRight(temp, size)
-    draw_hexagon(temp,size)
+        # -------------- Last Row of Hexagons 
+        temp = self.hexDownRight(temp, size)
+        self.draw_hexagon(temp,size)
     
-    for i in range(0,2):
-        temp = hexRight(temp,size)
-        draw_hexagon(temp,size)
+        for i in range(0,2):
+            temp = self.hexRight(temp,size)
+            self.draw_hexagon(temp,size)
     
+# ------------------------ Attempting to make colision functions ---------------------------    
+
+# Detects if there is a colision between a line and a line
+def collideLineLine(l1_x, l1_y, l2_x, l2_y):
     
+    # Normalize direction of the lines and start of the lines
+    p = pygame.math.Vector2(*l1_x)
+    line1Vec = pygame.math.Vector2(*l1_y) - p
+    r  = line1Vec.normalize()
     
+    q = pygame.math.Vector2(*l2_x)
+    line2Vec = pygame.math.Vector2(*l2_y) - q
+    s  = line2Vec.normalize()
+    
+    # Normal vectors to the lines
+    rNV = pygame.math.Vector2(r[1], -r[0])
+    sNV = pygame.math.Vector2(s[1], -s[0])
+    rdotSVN = r.dot(sNV)
+    
+    if abs(rdotSVN) < EPSILON:
+    #if rdotSVN == 0:
+        print("Parallel or very close to parellel lines") 
+        return False
+    
+    # Distance to intersection point
+    qp = q - p
+    #print(qp)
+    t = qp.dot(sNV) / rdotSVN
+    u = qp.dot(rNV) / rdotSVN
+    
+    return t > 0 and u > 0 and t*t < line1Vec.magnitude_squared() and u*u < line2Vec.magnitude_squared()
+    #return 0 <= t <= 1 and 0 <= u <= 1 and t * t <= line1Vec.magnitude_squared() and u * u <= line2Vec.magnitude_squared()
+
+# Detects if there is a colision between a rectangle and a line segment
+def collideRectLine(rect, p1, p2):
+    return (collideLineLine(p1, p2, rect.topLeft, rect.bottomLeft) or
+            collideLineLine(p1, p2, rect.bottomLeft, rect.bottomRight) or
+            collideLineLine(p1, p2, rect.bottomRight, rect.topRight) or
+            collideLineLine(p1, p2, rect.topRight, rect.topLeft))
+
+# Detects if a polygon and a rectangel are intersection
+# Achieved by testing each line segment in a polygone against the rectangle
+def collideRectPoly(rect, poly):
+    #print(poly[1], poly[2])
+    #print(rect) 
+    for i in range(len(poly) - 1):
+         if collideRectLine(rect, poly[i], poly[i+1]):
+            print(" --------- Collision!!! ------------")
+            return True
+    return False
+
+    
+
+
 # ---- Will make the game objects classes soon ----
         
-#class Board():
-    #def __init__self(self):
-        #self.rect = self.
+
         
 #class Road():
 class House():
@@ -144,6 +209,12 @@ class House():
         
         self.w = w
         self.h = h
+
+        # References used for collision detection
+        self.topLeft = [x,y]
+        self.topRight = [x+w,y]
+        self.bottomLeft = [x,y+h]
+        self.bottomRight = [x+w,y+h]
         
         self.fillColor = WHITE
         self.stained = False
@@ -154,6 +225,12 @@ class House():
         self.x1,self.y1 = xy
         self.x2 = xy[0] + self.w
         self.y2 = xy[1] + self.h
+        
+        # Sets references for collision detection
+        self.topLeft = [xy[0],xy[1]]
+        self.topRight = [xy[0]+self.w,xy[1]]
+        self.bottomLeft = [xy[0],xy[1]+self.h]
+        self.bottomRight = [xy[0]+self.w,xy[1]+self.h]
         
     # Returns a coordinate
     def getXY(self):
@@ -185,19 +262,32 @@ class House():
        
 
 # Attempt to setup entire board
-boardSetup(center, size)
+board = Board(center,size) 
+houses = []
+#board.boardSetup(center,size)
+#boardSetup(center, size)
 
-# Attempt to setup a single house and test for colision
-house = House(100,100,25,25,0)
-house.draw(window)
+# Attempt to setup a single house
+#house = House(150,150,25,25,0)
+#house.draw(window)
 
+# House is created, now colision test
+board.draw_hexagon(center,size)
+#collideRectPoly(house,board.points)
 
+print(collideLineLine((0, 0), (1, 1), (0, 1), (1, 0)))  # Expected: True (they intersect)
+print(collideLineLine((0, 0), (1, 0), (0, 1), (1, 1)))  # Expected: False (they do not intersect)
 # ------------------------------ Game loop begins ------------------------------------
+i = 0
+mb = False
 running = True
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            mb = True
             
         # Allows user to hit ESCAPE to exit the game window
         elif event.type == pygame.KEYDOWN:
@@ -205,11 +295,21 @@ while running:
                 running = False
                 
     # Placeing a house by getting mouse position and leftclicking
-    mb = pygame.mouse.get_pressed()
-    
-    house.setXY(pygame.mouse.get_pos())
-    if mb[0]:
-        house.draw(window)
+    if mb == True:            
+        houses.append(House(100,100, 25,25, i))
+        houses[i].setXY(pygame.mouse.get_pos())
+        houses[i].draw(window)
+        print(houses[i].topLeft, i)
+        
+        # Attempt to test collision, works 50% of the time: broken
+        collideRectPoly(houses[i],board.points)
+        
+        # Id for the houses
+        i = i+1
+        
+        # Setting mouseButton to false so only 1 house prints
+        mb = False
+     
     
     # Update the display
     pygame.display.flip()
