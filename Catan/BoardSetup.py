@@ -6,24 +6,17 @@ import sys
 from pygame.draw import polygon
 from pygame.locals import *
 
+# Importing external classes
+from House import House
+from gameTile import gameTile
+
+
 
 # Initialized the game engine
 pygame.init()
 
 # Initialized some game colors
 backGround = (0,171,255)  #blue
-WHITE = (255,255,255) #white
-
-# Tile Colors
-brickColor = (150,75,0)
-hayColor = (236,204,162)
-stoneColor = (128,128,128)
-sheepColor = (144,238,144)
-woodColor = (1,50,32)
-blackColor = (0,0,0)
-
-# Creates a list to store all of the tile colors
-tileColorList = [brickColor,hayColor,stoneColor,sheepColor,woodColor]
 
 # Create a window and set resolution
 window = pygame.display.set_mode((900,900))
@@ -35,14 +28,14 @@ window.fill(backGround)
 FPS = pygame.time.Clock()
 FPS.tick(60)
 
-# Center decides on where the first hexagon is placed
+# Center decides on where the first game tile is placed
+# Size is how big the game tile is
+# numTiles is how many tiles the game has
 center = (200,100)
 size = 75
 numTiles = 19
 
-houseStartCoord = (100,100)
-houseSize = (25,25)
-
+# Used for collision math
 EPSILON = 1e-9
 
 
@@ -123,108 +116,10 @@ def boardSetup(boardPieces):
 # Prints the whole board
 def printBoard(boardPieces):
     for i in range(0,numTiles):
-        boardPieces[i].draw_hexagon()
+        boardPieces[i].draw_hexagon(window)
 
-# Made the mistake of making the whole board an object
-# This class makes each hexagon tile an object            
-class gameTile():
-    def __init__(self, center, size, id):
-        self.center = center
-        self.size = size
-        self.points = []
 
-        # How we identify the hexagon we collided with?
-        self.id = id
-        
-    # Function to calculate hexagon points
-    def hexagon_points(self):
-        points = []
-        for i in range(6):
-            angle_deg = 60 * i - 30
-            angle_rad = math.radians(angle_deg)
-            x = self.center[0] + self.size * math.cos(angle_rad)
-            y = self.center[1] + self.size * math.sin(angle_rad)
-            points.append((x, y))
-            
-        # Set here for collision
-        self.points = points
-        return points
 
-    # Function to draw a hexagon
-    def draw_hexagon(self):
-        points = self.hexagon_points()
-        
-        # Draws a black hexagon to act as a black border
-        pygame.draw.polygon(window, blackColor, points,3)
-        
-        # Draws the filled in hexagon
-        pygame.draw.polygon(window, random.choice(tileColorList), points)
-        
-# Class for house object in game
-class House():
-    def __init__(self,x,y,w,h,id):
-        self.x1 = x
-        self.y1 = y
-        self.x2 = x + w
-        self.y2 = y + h
-        
-        self.w = w
-        self.h = h
-
-        # References used for collision detection
-        self.topLeft = [x,y]
-        self.topRight = [x+w,y]
-        self.bottomLeft = [x,y+h]
-        self.bottomRight = [x+w,y+h]
-        
-        self.fillColor = WHITE
-        self.stained = False
-        self.id = id
-        
-    # Setting the new position of a rectangle to mouse position
-    def setXY(self,xy):
-        # The following 2 lines update the rectangle coords 
-        # Now it will be placed 0.5 * width and 0.5 * height 
-        # This centers the house on the mouse, so where ever you click is more accurate
-        
-        # Sets position of x1 and y1 and shifts rectangle to middle of mouse
-        self.x1 = xy[0] - (0.5*self.w)
-        self.y1 = xy[1] - (0.5*self.h)
-        
-        
-        # Sets x2 and y2 based off of the shifted position
-        self.x2 = self.x1 + self.w
-        self.y2 = self.y1 + self.h
-        
-        # Sets references for collision detection, not used for drawing
-        self.topLeft = [self.x1,self.y1]
-        self.topRight = [self.x1+self.w,self.y1]
-        self.bottomLeft = [self.x1,self.y1+self.h]
-        self.bottomRight = [self.x1+self.w,self.y1+self.h]
-        
-    # Returns a coordinate
-    def getXY(self):
-        return(self.x1,self.y1)
-    
-    # Returns values needed to build a rectangle in the form of a tuple
-    def rect(self):
-        
-        coords = self.getXY()
-        
-        x1 = coords[0] 
-        y1 = coords[1]
-        
-        return (x1,y1,self.w, self.h)
-    
-    # Returns values needed to test for colision (x1,y1,x2,y2) in the form of a tuple
-    def coords(self):
-        return self.getXY() + (self.x2, self.y2)
-    
-    def draw(self, surface = None):
-        if not surface:
-            surface = pygame.display.get_surface()
-        pygame.draw.rect(surface,self.fillColor,self.rect(),0)
-        
 # ---- Will make the game objects classes soon ----
 
 # Class for road object in game
@@ -280,13 +175,7 @@ def collideRectLine(rect, p1, p2):
 # Detects if a polygon and a rectangel are intersection
 # Achieved by testing each line segment in a polygone against the rectangle
 def collideRectPoly(rect, poly):
-    #print(poly[0], poly[1])
-    #print(poly[1], poly[2])
-    #print(poly[2], poly[3])
-    #print(poly[3], poly[4])
-    #print(poly[4], poly[5])
-    #print(poly[5], poly[0])
-    #print(rect) 
+    
     for i in range(len(poly) - 1):
          if collideRectLine(rect, poly[i], poly[i+1]):
             #print(" --------- Collision!!! ------------")
@@ -336,7 +225,7 @@ while running:
                 
     # Placeing a house by getting mouse position and leftclicking
     if mb == True:            
-        houses.append(House(100,100, 25,25, i))
+        houses.append(House(100,100,25,25, i))
         houses[i].setXY(pygame.mouse.get_pos())
         houses[i].draw(window)
         #print(houses[i].topLeft, i)
@@ -345,7 +234,7 @@ while running:
         for j in range(0,numTiles):
             if collideRectPoly(houses[i],boardPieces[j].points):
                 print("Collision with hexagon:",boardPieces[j].id)
-            
+          
         
         # Id for the houses
         i = i+1
