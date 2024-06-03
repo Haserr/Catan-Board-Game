@@ -8,6 +8,7 @@ from pygame.locals import *
 
 # Importing external classes
 from House import House
+from Road import Road
 from gameTile import gameTile
 
 
@@ -121,9 +122,6 @@ def printBoard(boardPieces):
 
 
 # ---- Will make the game objects classes soon ----
-
-# Class for road object in game
-#class Road():
         
 # Class for city object in game        
 #class City():
@@ -203,13 +201,24 @@ boardSetup(boardPieces)
 # Prints the board to the screen
 printBoard(boardPieces)
 
-# Initiates the list of houses
+# Initiates the list of houses and roads and their Id #'s
 houses = []
+roads = []
+roadId = 0
+houseId = 0
+
+# Give instructions on beginning of game
+print("Controls: Press 'h' to toggle houses, left click on the board to place a house")
 
 # ------------------------------ Game loop begins ------------------------------------
-i = 0 #House id or index, need to change name 
+#i = 0 #House id or index, need to change name 
+
+# Bools
 mb = False
+placeHouse = False
+placeRoad = False
 running = True
+
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -218,29 +227,59 @@ while running:
         if event.type == pygame.MOUSEBUTTONDOWN:
             mb = True
             
-        # Allows user to hit ESCAPE to exit the game window
+        # Gets keyboard input from user
         elif event.type == pygame.KEYDOWN:
+            
+            # Allows user to hit ESCAPE to exit the game window
             if event.key == pygame.K_ESCAPE:
                 running = False
                 
+            # Allow user to hit 'h' to place a house
+            elif event.key == pygame.K_h:
+                placeHouse = True
+                
+            # Allow user to hit 'r' to place a road
+            elif event.key == pygame.K_r:
+                placeRoad = True
+                
     # Placeing a house by getting mouse position and leftclicking
-    if mb == True:            
-        houses.append(House(100,100,25,25, i))
-        houses[i].setXY(pygame.mouse.get_pos())
-        houses[i].draw(window)
-        #print(houses[i].topLeft, i)
+    if mb == True:  
         
-        # Attempt to test collision, need to loop through all of the gameTiles
-        for j in range(0,numTiles):
-            if collideRectPoly(houses[i],boardPieces[j].points):
-                print("Collision with hexagon:",boardPieces[j].id)
+        # Placing a house:  Make this a function
+        if placeHouse == True:
+            houses.append(House(100,100,25,25, houseId))
+            houses[houseId].setXY(pygame.mouse.get_pos())
+            houses[houseId].draw(window)
+            #print(houses[i].topLeft, i)
+        
+            # Attempt to test collision, need to loop through all of the gameTiles
+            for j in range(0,numTiles):
+                if collideRectPoly(houses[houseId],boardPieces[j].points):
+                    print("Collision with hexagon:",boardPieces[j].id)
           
         
-        # Id for the houses
-        i = i+1
-        
+            # Id for the houses
+            houseId = houseId + 1
+            placeHouse = False
+            
+        # Placing a road:  Make this a function
+        if placeRoad == True:
+            roads.append(Road(100,100,25,10,roadId))
+            roads[roadId].setXY(pygame.mouse.get_pos())
+            roads[roadId].draw(window)
+            
+            # Attempt to test collision, need to loop through all of the gameTiles
+            for j in range(0,numTiles):
+                if collideRectPoly(roads[roadId],boardPieces[j].points):
+                    print("Collision with hexagon:",boardPieces[j].id)
+
+            roadId = roadId + 1
+            placeRoad = False
+            
+
         # Setting mouseButton to false so only 1 house prints
         mb = False
+       
      
     
     # Update the display
