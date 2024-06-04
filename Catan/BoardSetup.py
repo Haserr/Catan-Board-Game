@@ -255,9 +255,13 @@ while running:
             # Attempt to test collision, need to loop through all of the gameTiles
             for j in range(0,numTiles):
                 if collideRectPoly(houses[houseId],boardPieces[j].points):
+                    houses[houseId].tileId.append(boardPieces[j].id)
                     print("Collision with hexagon:",boardPieces[j].id)
-          
-        
+            
+            # Just a check for if the House object is storing the proper gameTiles
+            for i in houses[houseId].tileId:
+                print("TileID:",i)
+                
             # Id for the houses
             houseId = houseId + 1
             placeHouse = False
@@ -271,7 +275,12 @@ while running:
             # Attempt to test collision, need to loop through all of the gameTiles
             for j in range(0,numTiles):
                 if collideRectPoly(roads[roadId],boardPieces[j].points):
+                    roads[roadId].tileId.append(boardPieces[j].id)
                     print("Collision with hexagon:",boardPieces[j].id)
+                    
+             # Just a check for if the Road object is storing the proper gameTiles       
+            for i in roads[roadId].tileId:
+                print("TileId:",i)
 
             roadId = roadId + 1
             placeRoad = False

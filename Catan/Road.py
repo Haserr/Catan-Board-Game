@@ -25,6 +25,9 @@ class Road():
         self.stained = False
         self.id = id
         
+        # Keeps track of tiles it is touching
+        self.tileId = []
+        
     # Setting the new position of a rectangle to mouse position
     def setXY(self,xy):
         # The following 2 lines update the rectangle coords 

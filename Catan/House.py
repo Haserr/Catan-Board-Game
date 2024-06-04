@@ -24,6 +24,9 @@ class House():
         self.fillColor = WHITE
         self.stained = False
         self.id = id
+
+        # Keeps track of tiles it is touching
+        self.tileId = []
         
     # Setting the new position of a rectangle to mouse position
     def setXY(self,xy):
